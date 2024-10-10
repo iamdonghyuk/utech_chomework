@@ -1,5 +1,5 @@
 
-// UDPServerDlg.h : Çì´õ ÆÄÀÏ
+// UDPServerDlg.h : í—¤ë” íŒŒì¼
 //
 
 #pragma once
@@ -16,23 +16,23 @@ struct ThreadArg
 
 class CDataSocket;
 
-// CUDPServerDlg ´ëÈ­ »óÀÚ
+// CUDPServerDlg ëŒ€í™” ìƒì
 class CUDPServerDlg : public CDialogEx
 {
-// »ı¼ºÀÔ´Ï´Ù.
+// ìƒì„±ì…ë‹ˆë‹¤.
 public:
-	CUDPServerDlg(CWnd* pParent = NULL);	// Ç¥ÁØ »ı¼ºÀÚÀÔ´Ï´Ù.
+	CUDPServerDlg(CWnd* pParent = NULL);	// í‘œì¤€ ìƒì„±ìì…ë‹ˆë‹¤.
 
-// ´ëÈ­ »óÀÚ µ¥ÀÌÅÍÀÔ´Ï´Ù.
+// ëŒ€í™” ìƒì ë°ì´í„°ì…ë‹ˆë‹¤.
 #ifdef AFX_DESIGN_TIME
 	enum { IDD = IDD_UDPSERVER_DIALOG };
 #endif
 
 	protected:
-	virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV Áö¿øÀÔ´Ï´Ù.
+	virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV ì§€ì›ì…ë‹ˆë‹¤.
 
 
-// ±¸ÇöÀÔ´Ï´Ù.
+// êµ¬í˜„ì…ë‹ˆë‹¤.
 protected:
 	HICON m_hIcon;
 

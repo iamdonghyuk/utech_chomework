@@ -1,4 +1,4 @@
-// DataSocket.cpp : ±¸Çö ÆÄÀÏÀÔ´Ï´Ù.
+// DataSocket.cpp : êµ¬í˜„ íŒŒì¼ì…ë‹ˆë‹¤.
 //
 #include "stdafx.h"
 #include "UDPClient.h"

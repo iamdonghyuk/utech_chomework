@@ -1,6 +1,6 @@
 #pragma once
 #include "UDPServerDlg.h"
-// CDataSocket ¸í·É ´ë»óÀÔ´Ï´Ù.
+// CDataSocket ëª…ë ¹ ëŒ€ìƒì…ë‹ˆë‹¤.
 
 class CUDPServerDlg;
 

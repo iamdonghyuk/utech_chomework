@@ -30,3 +30,11 @@
 *.exe
 *.out
 *.app
+UDPClient/.vs/ProjectSettings.json
+UDPClient/.vs/slnx.sqlite
+UDPClient/.vs/UDPClient/FileContentIndex/3ce0f4bd-b067-42cc-87c9-d3cf166cb3a1.vsidx
+UDPClient/.vs/UDPClient/v17/Browse.VC.db
+UDPClient/.vs/UDPClient/v17/Browse.VC.db-shm
+UDPClient/.vs/UDPClient/v17/Browse.VC.db-wal
+UDPClient/.vs/UDPClient/v17/Browse.VC.opendb
+UDPClient/.vs/UDPClient/v17/ipch/AutoPCH/35e720366ed61266/UDPCLIENT.ipch

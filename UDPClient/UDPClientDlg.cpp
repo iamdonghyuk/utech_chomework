@@ -1,4 +1,4 @@
-// UDPClientDlg.cpp : ±¸Çö ÆÄÀÏ
+// UDPClientDlg.cpp : êµ¬í˜„ íŒŒì¼
 //
 
 #include "stdafx.h"
@@ -11,31 +11,31 @@
 #define new DEBUG_NEW
 #endif
 
-CCriticalSection tx_cs; // ¼Û½Å¿¡ »ç¿ëµÇ´Â Å©¸®Æ¼ÄÃ ¼½¼Ç °´Ã¼ ¼±¾ð
-CCriticalSection rx_cs; // ¼ö½Å¿¡ »ç¿ëµÇ´Â Å©¸®Æ¼ÄÃ ¼½¼Ç °´Ã¼ ¼±¾ð
+CCriticalSection tx_cs; // ì†¡ì‹ ì— ì‚¬ìš©ë˜ëŠ” í¬ë¦¬í‹°ì»¬ ì„¹ì…˜ ê°ì²´ ì„ ì–¸
+CCriticalSection rx_cs; // ìˆ˜ì‹ ì— ì‚¬ìš©ë˜ëŠ” í¬ë¦¬í‹°ì»¬ ì„¹ì…˜ ê°ì²´ ì„ ì–¸
 
-CString PeerAddr = _T("127.0.0.1"); // ¼­¹öÀÇ ÁÖ¼Ò¸¦ ³ªÅ¸³»´Â ¹®ÀÚ¿­, ±âº»°ªÀº "127.0.0.1"·Î ·ÎÄÃÈ£½ºÆ®¸¦ ÀÇ¹ÌÇÔ
+CString PeerAddr = _T("127.0.0.1"); // ì„œë²„ì˜ ì£¼ì†Œë¥¼ ë‚˜íƒ€ë‚´ëŠ” ë¬¸ìžì—´, ê¸°ë³¸ê°’ì€ "127.0.0.1"ë¡œ ë¡œì»¬í˜¸ìŠ¤íŠ¸ë¥¼ ì˜ë¯¸í•¨
 
-UINT srcPort = 7000; // ¼Û½Å¿¡ »ç¿ëµÉ ¼Ò½º Æ÷Æ® ¹øÈ£, ±âº»°ªÀº 7000, UDPClient1¹ø ÄÄÆÄÀÏ½Ã
-//UINT srcPort = 7001; // ¼Û½Å¿¡ »ç¿ëµÉ ¼Ò½º Æ÷Æ® ¹øÈ£, ±âº»°ªÀº 7001, UDPClient2¹ø ÄÄÆÄÀÏ½Ã
-UINT dstPort = 8000; // ¼ö½Å ´ë»ó Æ÷Æ® ¹øÈ£, ±âº»°ªÀº 8000
+UINT srcPort = 7000; // ì†¡ì‹ ì— ì‚¬ìš©ë  ì†ŒìŠ¤ í¬íŠ¸ ë²ˆí˜¸, ê¸°ë³¸ê°’ì€ 7000, UDPClient1ë²ˆ ì»´íŒŒì¼ì‹œ
+//UINT srcPort = 7001; // ì†¡ì‹ ì— ì‚¬ìš©ë  ì†ŒìŠ¤ í¬íŠ¸ ë²ˆí˜¸, ê¸°ë³¸ê°’ì€ 7001, UDPClient2ë²ˆ ì»´íŒŒì¼ì‹œ
+UINT dstPort = 8000; // ìˆ˜ì‹  ëŒ€ìƒ í¬íŠ¸ ë²ˆí˜¸, ê¸°ë³¸ê°’ì€ 8000
 
-// ÀÀ¿ë ÇÁ·Î±×·¥ Á¤º¸¿¡ »ç¿ëµÇ´Â CAboutDlg ´ëÈ­ »óÀÚÀÔ´Ï´Ù.
+// ì‘ìš© í”„ë¡œê·¸ëž¨ ì •ë³´ì— ì‚¬ìš©ë˜ëŠ” CAboutDlg ëŒ€í™” ìƒìžìž…ë‹ˆë‹¤.
 
 class CAboutDlg : public CDialogEx
 {
 public:
 	CAboutDlg();
 
-// ´ëÈ­ »óÀÚ µ¥ÀÌÅÍÀÔ´Ï´Ù.
+// ëŒ€í™” ìƒìž ë°ì´í„°ìž…ë‹ˆë‹¤.
 #ifdef AFX_DESIGN_TIME
 	enum { IDD = IDD_ABOUTBOX };
 #endif
 
 	protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV Áö¿øÀÔ´Ï´Ù.
+	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV ì§€ì›ìž…ë‹ˆë‹¤.
 
-// ±¸ÇöÀÔ´Ï´Ù.
+// êµ¬í˜„ìž…ë‹ˆë‹¤.
 protected:
 	DECLARE_MESSAGE_MAP()
 };
@@ -53,61 +53,61 @@ BEGIN_MESSAGE_MAP(CAboutDlg, CDialogEx)
 END_MESSAGE_MAP()
 
 
-// CUDPClientDlg ´ëÈ­ »óÀÚ
+// CUDPClientDlg ëŒ€í™” ìƒìž
 
 UINT RXThread(LPVOID arg)
 {
-	ThreadArg* pArg = (ThreadArg*)arg; // ¾²·¹µå ÀÎÀÚ ±¸Á¶Ã¼·Î Ä³½ºÆÃ
-	CStringList* plist = pArg->pList; // ¼ö½Å ¸Þ½ÃÁö ¸®½ºÆ® Æ÷ÀÎÅÍ
-	CUDPClientDlg* pDlg = (CUDPClientDlg*)pArg->pDlg; // Å¬¶óÀÌ¾ðÆ® ´ëÈ­»óÀÚ Æ÷ÀÎÅÍ
+	ThreadArg* pArg = (ThreadArg*)arg; // ì“°ë ˆë“œ ì¸ìž êµ¬ì¡°ì²´ë¡œ ìºìŠ¤íŒ…
+	CStringList* plist = pArg->pList; // ìˆ˜ì‹  ë©”ì‹œì§€ ë¦¬ìŠ¤íŠ¸ í¬ì¸í„°
+	CUDPClientDlg* pDlg = (CUDPClientDlg*)pArg->pDlg; // í´ë¼ì´ì–¸íŠ¸ ëŒ€í™”ìƒìž í¬ì¸í„°
 
-	while (pArg->Thread_run) // ¾²·¹µå ½ÇÇà ÇÃ·¡±× È®ÀÎ
+	while (pArg->Thread_run) // ì“°ë ˆë“œ ì‹¤í–‰ í”Œëž˜ê·¸ í™•ì¸
 	{
-		POSITION pos = plist->GetHeadPosition(); // ¸®½ºÆ®ÀÇ Ã¹ ¹øÂ° À§Ä¡¸¦ °¡Á®¿È
-		POSITION current_pos; // ÇöÀç À§Ä¡¸¦ ÀúÀåÇÒ º¯¼ö
+		POSITION pos = plist->GetHeadPosition(); // ë¦¬ìŠ¤íŠ¸ì˜ ì²« ë²ˆì§¸ ìœ„ì¹˜ë¥¼ ê°€ì ¸ì˜´
+		POSITION current_pos; // í˜„ìž¬ ìœ„ì¹˜ë¥¼ ì €ìž¥í•  ë³€ìˆ˜
 
 		while (pos != NULL)
 		{
-			current_pos = pos; // ÇöÀç À§Ä¡ ÀúÀå
+			current_pos = pos; // í˜„ìž¬ ìœ„ì¹˜ ì €ìž¥
 
-			rx_cs.Lock(); // ¼ö½Å Å©¸®Æ¼ÄÃ ¼½¼Ç Àá±Ý
-			CString str = plist->GetNext(pos); // ´ÙÀ½ ¼ö½Å ¸Þ½ÃÁö¸¦ °¡Á®¿È
-			rx_cs.Unlock(); // ¼ö½Å Å©¸®Æ¼ÄÃ ¼½¼Ç Àá±Ý ÇØÁ¦
+			rx_cs.Lock(); // ìˆ˜ì‹  í¬ë¦¬í‹°ì»¬ ì„¹ì…˜ ìž ê¸ˆ
+			CString str = plist->GetNext(pos); // ë‹¤ìŒ ìˆ˜ì‹  ë©”ì‹œì§€ë¥¼ ê°€ì ¸ì˜´
+			rx_cs.Unlock(); // ìˆ˜ì‹  í¬ë¦¬í‹°ì»¬ ì„¹ì…˜ ìž ê¸ˆ í•´ì œ
 
 			CString message;
-			pDlg->m_rx_edit.GetWindowTextW(message); // ÇöÀç ¼ö½Å Ã¢ÀÇ ÅØ½ºÆ®¸¦ °¡Á®¿È
-			message += str; // ¼ö½ÅÇÑ ¸Þ½ÃÁö Ãß°¡
-			pDlg->m_rx_edit.SetWindowTextW(message); // ¼ö½Å Ã¢¿¡ ÅØ½ºÆ® ¼³Á¤
-			pDlg->m_rx_edit.LineScroll(pDlg->m_rx_edit.GetLineCount()); // ¼ö½Å Ã¢ ½ºÅ©·ÑÀ» °¡Àå ¾Æ·¡·Î ÀÌµ¿
+			pDlg->m_rx_edit.GetWindowTextW(message); // í˜„ìž¬ ìˆ˜ì‹  ì°½ì˜ í…ìŠ¤íŠ¸ë¥¼ ê°€ì ¸ì˜´
+			message += str; // ìˆ˜ì‹ í•œ ë©”ì‹œì§€ ì¶”ê°€
+			pDlg->m_rx_edit.SetWindowTextW(message); // ìˆ˜ì‹  ì°½ì— í…ìŠ¤íŠ¸ ì„¤ì •
+			pDlg->m_rx_edit.LineScroll(pDlg->m_rx_edit.GetLineCount()); // ìˆ˜ì‹  ì°½ ìŠ¤í¬ë¡¤ì„ ê°€ìž¥ ì•„ëž˜ë¡œ ì´ë™
 
-			plist->RemoveAt(current_pos); // Ã³¸®ÇÑ ¸Þ½ÃÁö¸¦ ¸®½ºÆ®¿¡¼­ Á¦°Å
+			plist->RemoveAt(current_pos); // ì²˜ë¦¬í•œ ë©”ì‹œì§€ë¥¼ ë¦¬ìŠ¤íŠ¸ì—ì„œ ì œê±°
 		}
-		Sleep(10); // Àá½Ã ´ë±â
+		Sleep(10); // ìž ì‹œ ëŒ€ê¸°
 	}
 	return 0;
 }
 
 UINT TXThread(LPVOID arg)
 {
-	ThreadArg* pArg = (ThreadArg*)arg; // ¾²·¹µå ÀÎÀÚ ±¸Á¶Ã¼·Î Ä³½ºÆÃ
-	CStringList* plist = pArg->pList; // ¼Û½Å ¸Þ½ÃÁö ¸®½ºÆ® Æ÷ÀÎÅÍ
-	CUDPClientDlg* pDlg = (CUDPClientDlg*)pArg->pDlg; // Å¬¶óÀÌ¾ðÆ® ´ëÈ­»óÀÚ Æ÷ÀÎÅÍ
+	ThreadArg* pArg = (ThreadArg*)arg; // ì“°ë ˆë“œ ì¸ìž êµ¬ì¡°ì²´ë¡œ ìºìŠ¤íŒ…
+	CStringList* plist = pArg->pList; // ì†¡ì‹  ë©”ì‹œì§€ ë¦¬ìŠ¤íŠ¸ í¬ì¸í„°
+	CUDPClientDlg* pDlg = (CUDPClientDlg*)pArg->pDlg; // í´ë¼ì´ì–¸íŠ¸ ëŒ€í™”ìƒìž í¬ì¸í„°
 
-	while (pArg->Thread_run) // ¾²·¹µå ½ÇÇà ÇÃ·¡±× È®ÀÎ
+	while (pArg->Thread_run) // ì“°ë ˆë“œ ì‹¤í–‰ í”Œëž˜ê·¸ í™•ì¸
 	{
-		POSITION pos = plist->GetHeadPosition(); // ¸®½ºÆ®ÀÇ Ã¹ ¹øÂ° À§Ä¡¸¦ °¡Á®¿È
-		POSITION current_pos; // ÇöÀç À§Ä¡¸¦ ÀúÀåÇÒ º¯¼ö
+		POSITION pos = plist->GetHeadPosition(); // ë¦¬ìŠ¤íŠ¸ì˜ ì²« ë²ˆì§¸ ìœ„ì¹˜ë¥¼ ê°€ì ¸ì˜´
+		POSITION current_pos; // í˜„ìž¬ ìœ„ì¹˜ë¥¼ ì €ìž¥í•  ë³€ìˆ˜
 
 		while (pos != NULL)
 		{
-			current_pos = pos; // ÇöÀç À§Ä¡ ÀúÀå
+			current_pos = pos; // í˜„ìž¬ ìœ„ì¹˜ ì €ìž¥
 
-			tx_cs.Lock(); // ¼Û½Å Å©¸®Æ¼ÄÃ ¼½¼Ç Àá±Ý
-			CString str = plist->GetNext(pos); // ´ÙÀ½ ¼Û½Å ¸Þ½ÃÁö¸¦ °¡Á®¿È
-			tx_cs.Unlock(); // ¼Û½Å Å©¸®Æ¼ÄÃ ¼½¼Ç Àá±Ý ÇØÁ¦
+			tx_cs.Lock(); // ì†¡ì‹  í¬ë¦¬í‹°ì»¬ ì„¹ì…˜ ìž ê¸ˆ
+			CString str = plist->GetNext(pos); // ë‹¤ìŒ ì†¡ì‹  ë©”ì‹œì§€ë¥¼ ê°€ì ¸ì˜´
+			tx_cs.Unlock(); // ì†¡ì‹  í¬ë¦¬í‹°ì»¬ ì„¹ì…˜ ìž ê¸ˆ í•´ì œ
 
-			pDlg->m_tx_edit.LineScroll(pDlg->m_tx_edit.GetLineCount()); // ¼Û½Å Ã¢ ½ºÅ©·ÑÀ» °¡Àå ¾Æ·¡·Î ÀÌµ¿
-			pDlg->m_pDataSocket->SendToEx((LPCTSTR)str, 1024, dstPort, PeerAddr); // ¸Þ½ÃÁö¸¦ ´ë»ó
+			pDlg->m_tx_edit.LineScroll(pDlg->m_tx_edit.GetLineCount()); // ì†¡ì‹  ì°½ ìŠ¤í¬ë¡¤ì„ ê°€ìž¥ ì•„ëž˜ë¡œ ì´ë™
+			pDlg->m_pDataSocket->SendToEx((LPCTSTR)str, 1024, dstPort, PeerAddr); // ë©”ì‹œì§€ë¥¼ ëŒ€ìƒ
 			plist->RemoveAt(current_pos); 
 		}
 
@@ -140,14 +140,14 @@ BEGIN_MESSAGE_MAP(CUDPClientDlg, CDialogEx)
 END_MESSAGE_MAP()
 
 
-// CUDPClientDlg ¸Þ½ÃÁö Ã³¸®±â
+// CUDPClientDlg ë©”ì‹œì§€ ì²˜ë¦¬ê¸°
 
 BOOL CUDPClientDlg::OnInitDialog()
 {
-	// ±âº» ´ÙÀÌ¾ó·Î±× ÃÊ±âÈ­
+	// ê¸°ë³¸ ë‹¤ì´ì–¼ë¡œê·¸ ì´ˆê¸°í™”
 	CDialogEx::OnInitDialog();
 
-	// About ´ëÈ­»óÀÚ ¸Þ´º Ç×¸ñ Ãß°¡
+	// About ëŒ€í™”ìƒìž ë©”ë‰´ í•­ëª© ì¶”ê°€
 	ASSERT((IDM_ABOUTBOX & 0xFFF0) == IDM_ABOUTBOX);
 	ASSERT(IDM_ABOUTBOX < 0xF000);
 	CMenu* pSysMenu = GetSystemMenu(FALSE);
@@ -164,14 +164,14 @@ BOOL CUDPClientDlg::OnInitDialog()
 		}
 	}
 
-	// ¾ÆÀÌÄÜ ¼³Á¤
+	// ì•„ì´ì½˜ ì„¤ì •
 	SetIcon(m_hIcon, TRUE);
 	SetIcon(m_hIcon, FALSE);
 
-	// ÃÊ±â IP ÁÖ¼Ò ¼³Á¤
+	// ì´ˆê¸° IP ì£¼ì†Œ ì„¤ì •
 	m_ipaddr.SetWindowTextW(_T("127.0.0.1"));
 
-	// WSA ÃÊ±âÈ­
+	// WSA ì´ˆê¸°í™”
 	WSADATA wsa;
 	int error_code;
 	if ((error_code = WSAStartup(MAKEWORD(2, 2), &wsa)) != 0)
@@ -182,7 +182,7 @@ BOOL CUDPClientDlg::OnInitDialog()
 		AfxMessageBox(buffer, MB_ICONERROR);
 	}
 
-	// TXThread¿Í RXThread¿¡ »ç¿ëÇÒ CStringList »ý¼º
+	// TXThreadì™€ RXThreadì— ì‚¬ìš©í•  CStringList ìƒì„±
 	CStringList* newlist = new CStringList;
 	arg1.pList = newlist;
 	arg1.Thread_run = 1;
@@ -193,11 +193,11 @@ BOOL CUDPClientDlg::OnInitDialog()
 	arg2.Thread_run = 1;
 	arg2.pDlg = this;
 
-	// µ¥ÀÌÅÍ ¼ÒÄÏ »ý¼º ¹× Æ÷Æ® ¼³Á¤
+	// ë°ì´í„° ì†Œì¼“ ìƒì„± ë° í¬íŠ¸ ì„¤ì •
 	m_pDataSocket = new CDataSocket(this);
 	m_pDataSocket->Create(srcPort, SOCK_DGRAM);
 
-	// TXThread¿Í RXThread ½ÇÇà
+	// TXThreadì™€ RXThread ì‹¤í–‰
 	pThread1 = AfxBeginThread(TXThread, (LPVOID)&arg1);
 	pThread2 = AfxBeginThread(RXThread, (LPVOID)&arg2);
 
@@ -217,21 +217,21 @@ void CUDPClientDlg::OnSysCommand(UINT nID, LPARAM lParam)
 	}
 }
 
-// ´ëÈ­ »óÀÚ¿¡ ÃÖ¼ÒÈ­ ´ÜÃß¸¦ Ãß°¡ÇÒ °æ¿ì ¾ÆÀÌÄÜÀ» ±×¸®·Á¸é
-//  ¾Æ·¡ ÄÚµå°¡ ÇÊ¿äÇÕ´Ï´Ù.  ¹®¼­/ºä ¸ðµ¨À» »ç¿ëÇÏ´Â MFC ÀÀ¿ë ÇÁ·Î±×·¥ÀÇ °æ¿ì¿¡´Â
-//  ÇÁ·¹ÀÓ¿öÅ©¿¡¼­ ÀÌ ÀÛ¾÷À» ÀÚµ¿À¸·Î ¼öÇàÇÕ´Ï´Ù.
+// ëŒ€í™” ìƒìžì— ìµœì†Œí™” ë‹¨ì¶”ë¥¼ ì¶”ê°€í•  ê²½ìš° ì•„ì´ì½˜ì„ ê·¸ë¦¬ë ¤ë©´
+//  ì•„ëž˜ ì½”ë“œê°€ í•„ìš”í•©ë‹ˆë‹¤.  ë¬¸ì„œ/ë·° ëª¨ë¸ì„ ì‚¬ìš©í•˜ëŠ” MFC ì‘ìš© í”„ë¡œê·¸ëž¨ì˜ ê²½ìš°ì—ëŠ”
+//  í”„ë ˆìž„ì›Œí¬ì—ì„œ ì´ ìž‘ì—…ì„ ìžë™ìœ¼ë¡œ ìˆ˜í–‰í•©ë‹ˆë‹¤.
 
 void CUDPClientDlg::OnPaint()
 {
 	if (IsIconic())
 	{
-		// ÃÖ¼ÒÈ­µÈ »óÅÂ¿¡¼­´Â ¾ÆÀÌÄÜÀ» ±×¸°´Ù
+		// ìµœì†Œí™”ëœ ìƒíƒœì—ì„œëŠ” ì•„ì´ì½˜ì„ ê·¸ë¦°ë‹¤
 		CPaintDC dc(this);
 
-		// ¹è°æÀ» Áö¿ì±â À§ÇØ WM_ICONERASEBKGND ¸Þ½ÃÁö¸¦ Àü¼Û
+		// ë°°ê²½ì„ ì§€ìš°ê¸° ìœ„í•´ WM_ICONERASEBKGND ë©”ì‹œì§€ë¥¼ ì „ì†¡
 		SendMessage(WM_ICONERASEBKGND, reinterpret_cast<WPARAM>(dc.GetSafeHdc()), 0);
 
-		// ¾ÆÀÌÄÜÀÇ Å©±â¿Í À§Ä¡¸¦ °è»ê
+		// ì•„ì´ì½˜ì˜ í¬ê¸°ì™€ ìœ„ì¹˜ë¥¼ ê³„ì‚°
 		int cxIcon = GetSystemMetrics(SM_CXICON);
 		int cyIcon = GetSystemMetrics(SM_CYICON);
 		CRect rect;
@@ -239,18 +239,18 @@ void CUDPClientDlg::OnPaint()
 		int x = (rect.Width() - cxIcon + 1) / 2;
 		int y = (rect.Height() - cyIcon + 1) / 2;
 
-		// ¾ÆÀÌÄÜÀ» ±×¸²
+		// ì•„ì´ì½˜ì„ ê·¸ë¦¼
 		dc.DrawIcon(x, y, m_hIcon);
 	}
 	else
 	{
-		// ÃÖ¼ÒÈ­µÈ »óÅÂ°¡ ¾Æ´Ñ °æ¿ì ±âº» OnPaint() ÇÔ¼ö¸¦ È£Ãâ
+		// ìµœì†Œí™”ëœ ìƒíƒœê°€ ì•„ë‹Œ ê²½ìš° ê¸°ë³¸ OnPaint() í•¨ìˆ˜ë¥¼ í˜¸ì¶œ
 		CDialogEx::OnPaint();
 	}
 }
 
-// »ç¿ëÀÚ°¡ ÃÖ¼ÒÈ­µÈ Ã¢À» ²ô´Â µ¿¾È¿¡ Ä¿¼­°¡ Ç¥½ÃµÇµµ·Ï ½Ã½ºÅÛ¿¡¼­
-//  ÀÌ ÇÔ¼ö¸¦ È£ÃâÇÕ´Ï´Ù.
+// ì‚¬ìš©ìžê°€ ìµœì†Œí™”ëœ ì°½ì„ ë„ëŠ” ë™ì•ˆì— ì»¤ì„œê°€ í‘œì‹œë˜ë„ë¡ ì‹œìŠ¤í…œì—ì„œ
+//  ì´ í•¨ìˆ˜ë¥¼ í˜¸ì¶œí•©ë‹ˆë‹¤.
 HCURSOR CUDPClientDlg::OnQueryDragIcon()
 {
 	return static_cast<HCURSOR>(m_hIcon);
@@ -262,66 +262,66 @@ void CUDPClientDlg::OnBnClickedSend()
 {
 	if (m_pDataSocket == NULL)
 	{
-		// µ¥ÀÌÅÍ ¼ÒÄÏ¿¡ Á¢¼ÓµÇ¾î ÀÖÁö ¾ÊÀ» °æ¿ì, ¿À·ù ¸Þ½ÃÁö Ãâ·Â
-		MessageBox(_T("¼­¹ö¿¡ Á¢¼Ó ¾ÈÇÔ!"), _T("¾Ë¸²"), MB_ICONERROR);
+		// ë°ì´í„° ì†Œì¼“ì— ì ‘ì†ë˜ì–´ ìžˆì§€ ì•Šì„ ê²½ìš°, ì˜¤ë¥˜ ë©”ì‹œì§€ ì¶œë ¥
+		MessageBox(_T("ì„œë²„ì— ì ‘ì† ì•ˆí•¨!"), _T("ì•Œë¦¼"), MB_ICONERROR);
 	}
 	else
 	{
 		CString tx_message;
 		m_tx_edit_short.GetWindowTextW(tx_message);
-		tx_message += _T("\r\n");  // ¸Þ½ÃÁö¿¡ °³Çà ¹®ÀÚ Ãß°¡
+		tx_message += _T("\r\n");  // ë©”ì‹œì§€ì— ê°œí–‰ ë¬¸ìž ì¶”ê°€
 
-		tx_cs.Lock();  // °øÀ¯ º¯¼ö¿¡ Á¢±ÙÇÏ±â Àü¿¡ ¹ÂÅØ½º Àá±Ý
-		arg1.pList->AddTail(tx_message);  // ¸®½ºÆ®¿¡ ¸Þ½ÃÁö Ãß°¡
-		tx_cs.Unlock();  // ¹ÂÅØ½º Àá±Ý ÇØÁ¦
+		tx_cs.Lock();  // ê³µìœ  ë³€ìˆ˜ì— ì ‘ê·¼í•˜ê¸° ì „ì— ë®¤í…ìŠ¤ ìž ê¸ˆ
+		arg1.pList->AddTail(tx_message);  // ë¦¬ìŠ¤íŠ¸ì— ë©”ì‹œì§€ ì¶”ê°€
+		tx_cs.Unlock();  // ë®¤í…ìŠ¤ ìž ê¸ˆ í•´ì œ
 
-		m_tx_edit_short.SetWindowTextW(_T(""));  // ÂªÀº ¸Þ½ÃÁö ÀÔ·Â »óÀÚ ÃÊ±âÈ­
-		m_tx_edit_short.SetFocus();  // ÂªÀº ¸Þ½ÃÁö ÀÔ·Â »óÀÚ¿¡ Æ÷Ä¿½º ¼³Á¤
+		m_tx_edit_short.SetWindowTextW(_T(""));  // ì§§ì€ ë©”ì‹œì§€ ìž…ë ¥ ìƒìž ì´ˆê¸°í™”
+		m_tx_edit_short.SetFocus();  // ì§§ì€ ë©”ì‹œì§€ ìž…ë ¥ ìƒìžì— í¬ì»¤ìŠ¤ ì„¤ì •
 
 		int len = m_tx_edit.GetWindowTextLengthW();
 		m_tx_edit.SetSel(len, len);
-		m_tx_edit.ReplaceSel(tx_message);  // ÀüÃ¼ ¸Þ½ÃÁö ÀÔ·Â »óÀÚ¿¡ ¸Þ½ÃÁö Ãß°¡
+		m_tx_edit.ReplaceSel(tx_message);  // ì „ì²´ ë©”ì‹œì§€ ìž…ë ¥ ìƒìžì— ë©”ì‹œì§€ ì¶”ê°€
 	}
 }
 
 void CUDPClientDlg::OnBnClickedClose()
 {
 	CString tx_message;
-	m_tx_edit_short.GetWindowText(tx_message);  // ÂªÀº ¸Þ½ÃÁö ÀÔ·Â »óÀÚ¿¡¼­ ¸Þ½ÃÁö¸¦ °¡Á®¿È
-	tx_message += _T("\r\n");  // ¸Þ½ÃÁö¿¡ °³Çà ¹®ÀÚ¸¦ Ãß°¡
+	m_tx_edit_short.GetWindowText(tx_message);  // ì§§ì€ ë©”ì‹œì§€ ìž…ë ¥ ìƒìžì—ì„œ ë©”ì‹œì§€ë¥¼ ê°€ì ¸ì˜´
+	tx_message += _T("\r\n");  // ë©”ì‹œì§€ì— ê°œí–‰ ë¬¸ìžë¥¼ ì¶”ê°€
 
-	tx_cs.Lock();  // °øÀ¯ º¯¼ö¿¡ Á¢±ÙÇÏ±â Àü¿¡ ¹ÂÅØ½º Àá±Ý
-	arg1.pList->AddTail(tx_message);  // ¸®½ºÆ®¿¡ ¸Þ½ÃÁö Ãß°¡
-	tx_cs.Unlock();  // ¹ÂÅØ½º Àá±Ý ÇØÁ¦
+	tx_cs.Lock();  // ê³µìœ  ë³€ìˆ˜ì— ì ‘ê·¼í•˜ê¸° ì „ì— ë®¤í…ìŠ¤ ìž ê¸ˆ
+	arg1.pList->AddTail(tx_message);  // ë¦¬ìŠ¤íŠ¸ì— ë©”ì‹œì§€ ì¶”ê°€
+	tx_cs.Unlock();  // ë®¤í…ìŠ¤ ìž ê¸ˆ í•´ì œ
 
-	m_tx_edit_short.SetWindowText(_T(""));  // ÂªÀº ¸Þ½ÃÁö ÀÔ·Â »óÀÚ ÃÊ±âÈ­
-	m_tx_edit.SetWindowText(tx_message);  // ÀüÃ¼ ¸Þ½ÃÁö ÀÔ·Â »óÀÚ¿¡ ¸Þ½ÃÁö ¼³Á¤
+	m_tx_edit_short.SetWindowText(_T(""));  // ì§§ì€ ë©”ì‹œì§€ ìž…ë ¥ ìƒìž ì´ˆê¸°í™”
+	m_tx_edit.SetWindowText(tx_message);  // ì „ì²´ ë©”ì‹œì§€ ìž…ë ¥ ìƒìžì— ë©”ì‹œì§€ ì„¤ì •
 }
 
 
 void CUDPClientDlg::ProcessReceive(CDataSocket* pSocket, int nErrorCode)
 {
-	TCHAR pBuf[1024 + 1];  // ¼ö½ÅµÈ µ¥ÀÌÅÍ¸¦ ÀúÀåÇÒ ¹öÆÛ
-	CString strData;  // º¯È¯µÈ ¹®ÀÚ¿­ µ¥ÀÌÅÍ¸¦ ÀúÀåÇÒ º¯¼ö
-	int nbytes;  // ¼ö½ÅµÈ ¹ÙÀÌÆ® ¼ö
+	TCHAR pBuf[1024 + 1];  // ìˆ˜ì‹ ëœ ë°ì´í„°ë¥¼ ì €ìž¥í•  ë²„í¼
+	CString strData;  // ë³€í™˜ëœ ë¬¸ìžì—´ ë°ì´í„°ë¥¼ ì €ìž¥í•  ë³€ìˆ˜
+	int nbytes;  // ìˆ˜ì‹ ëœ ë°”ì´íŠ¸ ìˆ˜
 
-	nbytes = pSocket->ReceiveFromEx(pBuf, 1024, PeerAddr, dstPort);  // ¼ÒÄÏ¿¡¼­ µ¥ÀÌÅÍ¸¦ ¼ö½ÅÇÕ´Ï´Ù.
-	pBuf[nbytes] = NULL;  // ¹öÆÛ ¸¶Áö¸·¿¡ ³Î ¹®ÀÚ¸¦ Ãß°¡ÇÕ´Ï´Ù.
-	strData = (LPCTSTR)pBuf;  // ¹öÆÛÀÇ µ¥ÀÌÅÍ¸¦ CStringÀ¸·Î º¯È¯ÇÕ´Ï´Ù.
+	nbytes = pSocket->ReceiveFromEx(pBuf, 1024, PeerAddr, dstPort);  // ì†Œì¼“ì—ì„œ ë°ì´í„°ë¥¼ ìˆ˜ì‹ í•©ë‹ˆë‹¤.
+	pBuf[nbytes] = NULL;  // ë²„í¼ ë§ˆì§€ë§‰ì— ë„ ë¬¸ìžë¥¼ ì¶”ê°€í•©ë‹ˆë‹¤.
+	strData = (LPCTSTR)pBuf;  // ë²„í¼ì˜ ë°ì´í„°ë¥¼ CStringìœ¼ë¡œ ë³€í™˜í•©ë‹ˆë‹¤.
 
-	rx_cs.Lock();  // °øÀ¯ º¯¼ö¿¡ Á¢±ÙÇÏ±â Àü¿¡ ¹ÂÅØ½º Àá±Ý
-	arg2.pList->AddTail((LPCTSTR)strData);  // ¸®½ºÆ®¿¡ µ¥ÀÌÅÍ¸¦ Ãß°¡ÇÕ´Ï´Ù.
-	rx_cs.Unlock();  // ¹ÂÅØ½º Àá±Ý ÇØÁ¦
+	rx_cs.Lock();  // ê³µìœ  ë³€ìˆ˜ì— ì ‘ê·¼í•˜ê¸° ì „ì— ë®¤í…ìŠ¤ ìž ê¸ˆ
+	arg2.pList->AddTail((LPCTSTR)strData);  // ë¦¬ìŠ¤íŠ¸ì— ë°ì´í„°ë¥¼ ì¶”ê°€í•©ë‹ˆë‹¤.
+	rx_cs.Unlock();  // ë®¤í…ìŠ¤ ìž ê¸ˆ í•´ì œ
 }
 
 void CUDPClientDlg::ProcessClose(CDataSocket* pSocket, int nErrorCode)
 {
-	pSocket->Close();  // ¼ÒÄÏÀ» ´Ý½À´Ï´Ù.
-	delete m_pDataSocket;  // µ¥ÀÌÅÍ ¼ÒÄÏ °´Ã¼¸¦ »èÁ¦ÇÕ´Ï´Ù.
-	m_pDataSocket = NULL;  // µ¥ÀÌÅÍ ¼ÒÄÏ Æ÷ÀÎÅÍ¸¦ NULL·Î ¼³Á¤ÇÕ´Ï´Ù.
+	pSocket->Close();  // ì†Œì¼“ì„ ë‹«ìŠµë‹ˆë‹¤.
+	delete m_pDataSocket;  // ë°ì´í„° ì†Œì¼“ ê°ì²´ë¥¼ ì‚­ì œí•©ë‹ˆë‹¤.
+	m_pDataSocket = NULL;  // ë°ì´í„° ì†Œì¼“ í¬ì¸í„°ë¥¼ NULLë¡œ ì„¤ì •í•©ë‹ˆë‹¤.
 
-	int len = m_rx_edit.GetWindowTextLengthW();  // ÇöÀç ÅØ½ºÆ® »óÀÚÀÇ ±æÀÌ¸¦ °¡Á®¿É´Ï´Ù.
-	CString message = _T("Á¢¼ÓÁ¾·á\n");  // ÅØ½ºÆ®·Î Ç¥½ÃÇÒ ¸Þ½ÃÁöÀÔ´Ï´Ù.
-	m_rx_edit.SetSel(len, len);  // ÅØ½ºÆ® »óÀÚÀÇ ¸¶Áö¸· À§Ä¡·Î Ä¿¼­¸¦ ÀÌµ¿ÇÕ´Ï´Ù.
-	m_rx_edit.ReplaceSel(message);  // ÅØ½ºÆ® »óÀÚ¿¡ ¸Þ½ÃÁö¸¦ Ãß°¡ÇÕ´Ï´Ù.
+	int len = m_rx_edit.GetWindowTextLengthW();  // í˜„ìž¬ í…ìŠ¤íŠ¸ ìƒìžì˜ ê¸¸ì´ë¥¼ ê°€ì ¸ì˜µë‹ˆë‹¤.
+	CString message = _T("ì ‘ì†ì¢…ë£Œ\n");  // í…ìŠ¤íŠ¸ë¡œ í‘œì‹œí•  ë©”ì‹œì§€ìž…ë‹ˆë‹¤.
+	m_rx_edit.SetSel(len, len);  // í…ìŠ¤íŠ¸ ìƒìžì˜ ë§ˆì§€ë§‰ ìœ„ì¹˜ë¡œ ì»¤ì„œë¥¼ ì´ë™í•©ë‹ˆë‹¤.
+	m_rx_edit.ReplaceSel(message);  // í…ìŠ¤íŠ¸ ìƒìžì— ë©”ì‹œì§€ë¥¼ ì¶”ê°€í•©ë‹ˆë‹¤.
 }

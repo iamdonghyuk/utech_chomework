@@ -1,4 +1,4 @@
-// DataSocket.cpp : ±¸Çö ÆÄÀÏÀÔ´Ï´Ù.
+// DataSocket.cpp : êµ¬í˜„ íŒŒì¼ì…ë‹ˆë‹¤.
 //
 
 #include "stdafx.h"
@@ -30,4 +30,4 @@ void CDataSocket::OnClose(int nErrorCode)
 }
 
 
-// CDataSocket ¸â¹ö ÇÔ¼ö
+// CDataSocket ë©¤ë²„ í•¨ìˆ˜
